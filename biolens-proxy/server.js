@@ -30,6 +30,10 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', service: 'biolens-proxy' });
+});
+
 app.post('/hf-inference/models/:model', async (req, res) => {
   try {
     const response = await fetch(
