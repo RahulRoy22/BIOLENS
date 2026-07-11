@@ -1,7 +1,6 @@
 {
   "buildCommand": "npm run deploy",
   "outputDirectory": "dist",
-  "framework": "other",
   "rewrites": [
     {
       "source": "/(.*)",
