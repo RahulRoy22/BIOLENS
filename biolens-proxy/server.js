@@ -34,10 +34,16 @@ app.get('/', (req, res) => {
   res.json({ status: 'ok', service: 'biolens-proxy' });
 });
 
-app.post('/hf-inference/models/:model', async (req, res) => {
+app.post('/*', async (req, res) => {
+  const model = req.path.replace(/^\//, '');
+  if (!model) {
+    res.status(400).json({ error: 'Model name is required' });
+    return;
+  }
+
   try {
     const response = await fetch(
-      `https://router.huggingface.co/hf-inference/models/${req.params.model}`,
+      `https://router.huggingface.co/hf-inference/models/${model}`,
       {
         method: 'POST',
         headers: {
