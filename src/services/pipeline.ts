@@ -77,7 +77,7 @@ export const PipelineService = {
         null,
       wikipediaUrl: iNat?.wikipedia_url || null,
       photoUrl: iNat?.default_photo?.medium_url || null,
-      observationsCount: iNat?.observations_count || null,
+      observationsCount: typeof iNat?.observations_count === 'number' ? iNat.observations_count : null,
     };
 
     // 5. Cache the result

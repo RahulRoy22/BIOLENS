@@ -95,7 +95,7 @@ export const SpeciesCard: React.FC<Props> = ({ result }) => {
           <View style={styles.grid}>
             <InfoRow
               label="Observations"
-              value={observationsCount ? observationsCount.toLocaleString() : 'Unknown'}
+              value={observationsCount !== null && observationsCount !== undefined ? observationsCount.toLocaleString() : 'Unknown'}
             />
             {taxonomy?.vernacularName ? (
               <InfoRow label="Common Alias" value={taxonomy.vernacularName} />
