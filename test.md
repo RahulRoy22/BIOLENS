@@ -13,6 +13,9 @@ Select Android when prompted
 5. Build the APK
 eas build --platform android --profile preview
 This uploads your code to Expo's cloud servers, builds a standalone APK, and emails you the download link after ~10-15 minutes. Your friend installs that APK directly on their phone.
+
+
+
 What your friend needs
 - The APK file from step 5
 - Their own Hugging Face fine-grained token (they go to huggingface.co/settings/tokens, create one)

@@ -10,6 +10,7 @@ import {
 import { COLORS, SPACING, ROUNDING } from '../constants/theme';
 import { ActionButton } from './ActionButton';
 import { CacheService } from '../services/cache';
+import { CONFIG } from '../constants/config';
 
 interface Props {
   visible: boolean;
@@ -20,6 +21,7 @@ export const SettingsModal: React.FC<Props> = ({ visible, onClose }) => {
   const [token, setToken] = useState('');
   const [model, setModel] = useState('');
   const [saved, setSaved] = useState(false);
+  const isProxyMode = !!CONFIG.PROXY_URL;
 
   useEffect(() => {
     if (visible) {
@@ -34,7 +36,9 @@ export const SettingsModal: React.FC<Props> = ({ visible, onClose }) => {
   }, [visible]);
 
   const handleSave = async () => {
-    await CacheService.saveHFToken(token);
+    if (!isProxyMode) {
+      await CacheService.saveHFToken(token);
+    }
     await CacheService.saveHFModel(model);
     setSaved(true);
     setTimeout(onClose, 800);
@@ -45,15 +49,21 @@ export const SettingsModal: React.FC<Props> = ({ visible, onClose }) => {
       <View style={styles.overlay}>
         <View style={styles.sheet}>
           <Text style={styles.title}>⚙️ Settings</Text>
-          <Text style={styles.label}>Hugging Face API Token</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="hf_..."
-            value={token}
-            onChangeText={setToken}
-            autoCapitalize="none"
-            secureTextEntry
-          />
+          {!isProxyMode ? (
+            <>
+              <Text style={styles.label}>Hugging Face API Token</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="hf_..."
+                value={token}
+                onChangeText={setToken}
+                autoCapitalize="none"
+                secureTextEntry
+              />
+            </>
+          ) : (
+            <Text style={styles.proxyNote}>🔗 Using shared proxy — no token needed</Text>
+          )}
           <Text style={styles.label}>Model (optional)</Text>
           <TextInput
             style={styles.input}
@@ -118,6 +128,13 @@ const styles = StyleSheet.create({
     color: COLORS.textMuted,
     marginTop: SPACING.sm,
     lineHeight: 18,
+  },
+  proxyNote: {
+    fontSize: 13,
+    color: COLORS.primary,
+    fontWeight: '600',
+    marginTop: SPACING.sm,
+    marginBottom: SPACING.xs,
   },
   saved: {
     color: COLORS.primary,

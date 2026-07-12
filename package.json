@@ -2,6 +2,7 @@
   "name": "biolensapp",
   "version": "1.0.0",
   "main": "index.ts",
+  "homepage": "https://RahulRoy22.github.io/BIOLENS",
   "dependencies": {
     "@react-native-async-storage/async-storage": "^2.2.0",
     "expo": "~54.0.0",
@@ -16,13 +17,15 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.10",
+    "gh-pages": "^6.3.0",
     "typescript": "~5.9.2"
   },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "deploy": "npx expo export --platform web && node fix-paths.js && npx gh-pages -d dist"
   },
   "private": true
 }

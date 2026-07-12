@@ -24,16 +24,18 @@ export const IdentificationService = {
     // Read the image as base64 (legacy API handles file:// and content://)
     const base64 = await readAsStringAsync(fileUri, { encoding: 'base64' });
 
-    // HF Inference Providers API expects base64 in a JSON payload.
-    // Endpoint: https://router.huggingface.co/hf-inference/models/{model}
+    const baseUrl = CONFIG.PROXY_URL || CONFIG.HF_API_BASE_URL;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (!CONFIG.PROXY_URL) {
+      headers.Authorization = `Bearer ${token}`;
+    }
     const response = await fetch(
-      `${CONFIG.HF_API_BASE_URL}/${modelName}`,
+      `${baseUrl}/${modelName}`,
       {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ inputs: base64 }),
       }
     );

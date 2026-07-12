@@ -13,6 +13,7 @@ import { COLORS, SPACING, ROUNDING } from '../constants/theme';
 import { ActionButton } from '../components/ActionButton';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ErrorCard } from '../components/ErrorCard';
+import { CONFIG } from '../constants/config';
 import { CacheService } from '../services/cache';
 import { PipelineService } from '../services/pipeline';
 import { OrganismResult } from '../types';
@@ -86,7 +87,7 @@ export const HomeScreen: React.FC<Props> = ({ onResult, hasToken }) => {
     if (!imageUri) return;
 
     const token = await CacheService.getHFToken();
-    if (!token) {
+    if (!token && !CONFIG.PROXY_URL) {
       setError({
         message: 'No API token configured.',
         suggestion: 'Add your free Hugging Face API token in settings to enable identification.',
@@ -101,7 +102,7 @@ export const HomeScreen: React.FC<Props> = ({ onResult, hasToken }) => {
     try {
       // Use the URI itself as the cache key (same gallery image = same URI)
       const fingerprint = imageUri;
-      const result = await PipelineService.run(imageUri, fingerprint, token, setLoadingMessage);
+      const result = await PipelineService.run(imageUri, fingerprint, token ?? '', setLoadingMessage);
       onResult(result, imageUri);
     } catch (e: any) {
       console.warn('Identification failed:', e);

@@ -1,5 +1,7 @@
 # BioLens App
 
+**[Live Web Demo](https://RahulRoy22.github.io/BIOLENS)**
+
 A mobile app for identifying plants and organisms in the wild. It analyzes photos using AI and enriches the results with data from biodiversity APIs.
 
 ## Technical Architecture
