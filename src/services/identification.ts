@@ -2,6 +2,7 @@ import { CONFIG } from '../constants/config';
 import { CacheService } from './cache';
 import { IdentificationResult } from '../types';
 import { readAsStringAsync } from 'expo-file-system/legacy';
+import { Platform } from 'react-native';
 
 /**
  * Sends the local image to the Hugging Face Inference API
@@ -21,8 +22,24 @@ export const IdentificationService = {
   ): Promise<IdentificationResult> {
     const modelName = model || (await CacheService.getHFModel());
 
-    // Read the image as base64 (legacy API handles file:// and content://)
-    const base64 = await readAsStringAsync(fileUri, { encoding: 'base64' });
+    let base64: string;
+    if (Platform.OS === 'web') {
+      // On web, fileUri is a blob:// URL which expo-file-system cannot read.
+      const res = await fetch(fileUri);
+      const blob = await res.blob();
+      base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          resolve(dataUrl.split(',')[1]);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } else {
+      // Native uses expo-file-system
+      base64 = await readAsStringAsync(fileUri, { encoding: 'base64' });
+    }
 
     const baseUrl = CONFIG.PROXY_URL || CONFIG.HF_API_BASE_URL;
     const headers: Record<string, string> = {
