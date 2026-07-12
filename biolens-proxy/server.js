@@ -1,6 +1,9 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
+
 const app = express();
+app.use(cors());
 
 const HF_TOKEN = process.env.HF_TOKEN;
 if (!HF_TOKEN) {
