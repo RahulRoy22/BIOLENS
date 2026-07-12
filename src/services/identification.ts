@@ -48,25 +48,64 @@ export const IdentificationService = {
     if (!CONFIG.PROXY_URL) {
       headers.Authorization = `Bearer ${token}`;
     }
-    const response = await fetch(
-      `${baseUrl}/${modelName}`,
-      {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ inputs: base64 }),
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+    let data;
+    try {
+      let retryCount = 0;
+      let response: Response | null = null;
+
+      while (retryCount < 5) {
+        response = await fetch(`${baseUrl}/${modelName}`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ inputs: base64 }),
+          signal: controller.signal,
+        });
+
+        // Hugging Face returns 503 when the model is cold and spinning up.
+        if (response.status === 503) {
+          const errorText = await response.text().catch(() => '');
+          let waitTime = 3000;
+          try {
+            const parsed = JSON.parse(errorText);
+            if (parsed.estimated_time) {
+              waitTime = Math.max(2000, Math.min(parsed.estimated_time * 1000, 15000));
+            }
+          } catch (e) {
+            // ignore parsing error
+          }
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+          retryCount++;
+          continue;
+        }
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => '');
+          throw new Error(
+            `Vision server error (${response.status}). ${
+              errorText || 'The model may be loading or your token may be invalid.'
+            }`
+          );
+        }
+
+        break;
       }
-    );
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => '');
-      throw new Error(
-        `Vision server error (${response.status}). ${
-          errorText || 'The model may be loading or your token may be invalid.'
-        }`
-      );
+      if (!response || !response.ok) {
+        throw new Error('Failed to connect to Hugging Face API after retries.');
+      }
+
+      data = await response.json();
+    } catch (e: any) {
+      if (e.name === 'AbortError') {
+        throw new Error('Analysis timed out after 45 seconds. The connection was too slow.');
+      }
+      throw e;
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const data = await response.json();
 
     // Hugging Face image-classification returns an array of { label, score }
     if (Array.isArray(data) && data.length > 0 && data[0]?.label) {

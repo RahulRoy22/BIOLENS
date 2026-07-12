@@ -15,12 +15,23 @@ export const INaturalistService = {
       query
     )}&limit=10`;
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`iNaturalist search failed (${response.status}).`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    let data;
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`iNaturalist search failed (${response.status}).`);
+      }
+      data = await response.json();
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw new Error('iNaturalist search timed out.');
+      throw e;
+    } finally {
+      clearTimeout(timeoutId);
     }
 
-    const data = await response.json();
     const results: iNatTaxon[] = data.results || [];
 
     if (results.length === 0) return null;
