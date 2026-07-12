@@ -59,28 +59,25 @@ export const HomeScreen: React.FC<Props> = ({ onResult, hasToken }) => {
 
     const asset = result.assets[0];
 
-    // Validate file type
-    const uri = asset.uri;
-    const lower = uri.toLowerCase();
-    const valid = lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower.endsWith('.png') || lower.endsWith('.webp');
-    if (!valid) {
-      setError({
-        message: 'Invalid file type.',
-        suggestion: 'Please upload a clear JPG, PNG, or WebP photo.',
-      });
+    // Validate file type using mimeType instead of URI extension (which fails on mobile content:// URIs)
+    if (asset.mimeType && !asset.mimeType.startsWith('image/')) {
+      Alert.alert(
+        'Invalid file type',
+        'Please upload a clear JPG, PNG, or WebP photo.'
+      );
       return;
     }
 
     // Validate file size
     if (asset.fileSize && asset.fileSize > 10 * 1024 * 1024) {
-      setError({
-        message: 'Image is too large.',
-        suggestion: 'Please use an image smaller than 10MB.',
-      });
+      Alert.alert(
+        'Image is too large',
+        'Please use an image smaller than 10MB.'
+      );
       return;
     }
 
-    setImageUri(uri);
+    setImageUri(asset.uri);
   };
 
   const handleIdentify = async () => {
