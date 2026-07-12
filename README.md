@@ -74,7 +74,9 @@ BioLensApp/
 │   ├── services/             # API integrations
 │   └── types/                # TypeScript interfaces
 ├── App.tsx                   # Root React entry point
-├── app.json                  # Expo project config
+├── app.config.js             # Dynamic Expo project config
+├── vercel.json               # Vercel deployment config
+├── fix-paths.js              # GitHub pages post-export script
 ├── package.json              # Dependencies & scripts
 └── tsconfig.json             # TypeScript config
 ```
@@ -140,6 +142,16 @@ BioLensApp/
    - Default: `google/vit-base-patch16-224`
    - Works with any ImageNet-style classification model
    - VQA models also supported if user specifies
+
+## Web Deployment
+
+The web frontend is designed to be fully compatible with both GitHub Pages and Vercel.
+
+**GitHub Pages**:
+Run `npm run deploy`. This uses the `fix-paths.js` script to properly route assets without double-prefixing and generates a `.nojekyll` file so GitHub serves the Expo output correctly.
+
+**Vercel**:
+Vercel is supported natively. The `app.config.js` file detects the `VERCEL` environment variable and dynamically removes the `assetPrefix`, while `vercel.json` ensures that Single Page App routing works correctly without strict MIME type conflicts.
 
 ## Running the App
 

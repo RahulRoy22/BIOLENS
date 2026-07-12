@@ -35,6 +35,10 @@ Expo React Native app (TypeScript) for identifying plants/organisms from photos 
 ## Architecture
 - No backend — pure client-side app calling 3rd-party APIs directly or through proxy
 - HF API: POST base64 image -> returns labels with confidence scores
+- Image parsing on the web uses `fetch()` and `FileReader` to bypass `expo-file-system` restrictions for `blob:` URLs.
+- Image validation uses `mimeType` instead of file extensions to support Android `content://` URIs.
 - iNaturalist: resolves common names, conservation status, photos, Wikipedia links
 - GBIF: fetches taxonomic hierarchy and descriptions
 - Results cached in AsyncStorage (1 week TTL, keyed by image URI)
+- **Proxy Server**: Uses CORS to allow cross-origin requests from the web frontend, and uses wildcard routing (`/*`) to correctly match complex HF model names containing slashes.
+- **Web Deployment**: Supports GitHub Pages (using `fix-paths.js` to prevent double-prefixing and generating `.nojekyll`) and Vercel (`app.config.js` dynamically removes `assetPrefix` and `vercel.json` provides SPA fallback routing).
