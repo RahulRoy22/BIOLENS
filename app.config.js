@@ -1,0 +1,37 @@
+export default {
+  expo: {
+    name: "BioLensApp",
+    slug: "BioLensApp",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    userInterfaceStyle: "light",
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: "com.rahulroy007.BioLensApp",
+      infoPlist: {
+        ITSAppUsesNonExemptEncryption: false
+      }
+    },
+    android: {
+      package: "com.rahulroy007.BioLensApp",
+      adaptiveIcon: {
+        backgroundColor: "#E6F4FE",
+        foregroundImage: "./assets/android-icon-foreground.png",
+        backgroundImage: "./assets/android-icon-background.png",
+        monochromeImage: "./assets/android-icon-monochrome.png"
+      },
+      predictiveBackGestureEnabled: false
+    },
+    web: {
+      favicon: "./assets/favicon.png",
+      // Remove prefix if Vercel is building the app, otherwise keep it for GitHub Pages
+      assetPrefix: process.env.VERCEL ? undefined : "/BIOLENS"
+    },
+    extra: {
+      eas: {
+        projectId: "0cb91dab-991a-45fc-ba32-ecd002a6e39c"
+      }
+    }
+  }
+};
